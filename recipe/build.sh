@@ -101,10 +101,11 @@ cmake -LAH \
 
 make -j${CPU_COUNT}
 
-if [[ -n "${ROOT_RUN_GTESTS}" ]]; then
+# Unconditionally run root gtests
+#if [[ -n "${ROOT_RUN_GTESTS}" ]]; then
     # Run gtests
     ctest -j${CPU_COUNT} -T test --no-compress-output
-fi
+#fi
 
 make install
 
