@@ -26,7 +26,8 @@ sed -i.bak -e "s@${OLDVERSIONMACOS}@${MACOSX_DEPLOYMENT_TARGET}@g" \
 # This is part of CMake, and is manually removed for a better link
 # May not be needed, but nice to do
 # Is in a current PR to ROOT: #3397
-rm root-source/cmake/modules/FindGSL.cmake
+# Add -f to avoid error in newer versions where this module does not exist
+rm -f root-source/cmake/modules/FindGSL.cmake
 
 if [ "$(uname)" == "Linux" ]; then
     cmake_args="-DCMAKE_TOOLCHAIN_FILE=${RECIPE_DIR}/toolchain.cmake -DCMAKE_AR=${GCC_AR} -DCLANG_DEFAULT_LINKER=${LD_GOLD} -DDEFAULT_SYSROOT=${PREFIX}/${HOST}/sysroot -Dx11=ON -DRT_LIBRARY=${PREFIX}/${HOST}/sysroot/usr/lib/librt.so"
