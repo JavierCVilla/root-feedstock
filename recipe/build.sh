@@ -56,7 +56,7 @@ export CXXFLAGS
 # The cross-linux toolchain breaks find_file relative to the current file
 # Patch up with sed
 sed -i -E 's#(ROOT_TEST_DRIVER RootTestDriver.cmake PATHS \$\{THISDIR\} \$\{CMAKE_MODULE_PATH\} NO_DEFAULT_PATH)#\1 CMAKE_FIND_ROOT_PATH_BOTH#g' \
-    ../root-source/cmake/modules/RootNewMacros.cmake
+    ../root-source/cmake/modules/RootMacros.cmake
 
 cmake -LAH \
     "${CMAKE_PLATFORM_FLAGS[@]}" \
@@ -77,7 +77,10 @@ cmake -LAH \
     -Dshared=ON \
     -Dsoversion=ON \
     -Dbuiltin_clang=OFF \
+    -Dbuiltin_cling=OFF \
     -Dbuiltin_glew=OFF \
+    -Dbuiltin_gl2ps=ON \
+    -Dbuiltin_ftgl=ON \
     -Dbuiltin_xrootd=OFF \
     -Dbuiltin_davix=OFF \
     -Dbuiltin_llvm=OFF \
@@ -98,7 +101,7 @@ cmake -LAH \
     -Dpythia6=OFF \
     -Dpythia8=ON \
     -Dtesting=ON \
-    -Droottest=OFF \
+    -Droottest=ON \
     ../root-source
 
 make -j${CPU_COUNT}
