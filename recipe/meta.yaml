@@ -1,6 +1,6 @@
 {% set name = "root" %}
-{% set version = "6.16.00" %}
-{% set hash = "c8415df5a0ec1619df5da0a2a36d79a47f1cf5927ee66cb5f045b39bb250c79a" %}
+{% set version = "6.18.00" %}
+{% set hash = "ee11687172a5d692a082ebfbeea4e0d5fb2f65db88968c0327d10793561c2c1b" %}
 {% set clang_version = "5.0.0" %}
 {% set clang_patches_version = "6.16.00" %}
 
@@ -18,20 +18,16 @@ source:
 {%- endif %}
   folder: root-source
   patches:
-{%- if "ROOT_JENKINS_GIT_REV" not in os.environ %}
-    - patches/root-6.18.00_root_config_cxxstd_flags.patch
-    - patches/root-6.16.02_allow_setting_clang_version.patch  # [osx]
-    - patches/root-6.16.02_not_test_cxx11_clang_4.patch  # [osx]
-{%- endif %}
+    - patches/root-6.18.02-dont-use-cmake-cxx-standard.patch
+    - patches/root-6.18.02-force-search-of-build-related-files.patch
     - patches/root-x.xx.xx_cling-runtime-sysroot.patch
     - patches/root-x.xx.xx_python_mac_os.patch  # [osx]
     - patches/root-x.xx.xx-copy-abspath-headers.patch  # [osx]
     - patches/root-x.xx.xx-osx-remove-hardcoded-sysroot.patch  # [osx]
 
 build:
-  number: 8
+  number: 18
   skip: True  # [win]
-  features:
   run_exports:
     # https://abi-laboratory.pro/?view=timeline&l=root
     - {{ pin_subpackage('root', max_pin='x.x.x') }}
@@ -44,10 +40,17 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
-    - {{ cdt('mesa-libgl-devel') }}  # [linux]
     - cmake
     - git
     - pkg-config
+    - sed
+    # Required for OpenGL support
+    # See https://conda-forge.org/docs/maintainer/knowledge_base.html?highlight=cdt#libgl
+    - {{ cdt('mesa-libgl-devel') }}  # [linux]
+    - {{ cdt('mesa-dri-drivers') }}  # [linux]
+    - {{ cdt('libselinux') }}  # [linux]
+    - {{ cdt('libxdamage') }}  # [linux]
+    - {{ cdt('libxxf86vm') }}  # [linux]
   host:
     - libblas
     - libcblas
@@ -58,12 +61,14 @@ requirements:
     - cfitsio
     - clangdev={{ clang_version }}
     - clang_variant * cling_{{ clang_patches_version }}
-    - davix
+    - davix >=0.7.2
     - fftw
     - freetype
-    - giflib
-    - gsl
     - gdk-pixbuf
+    - giflib
+    - glew
+    - graphviz
+    - gsl
     - krb5  # [osx]
     - libglu  # [linux]
     - libpng
@@ -89,11 +94,14 @@ requirements:
     - xorg-libxau  # [linux]
     - xorg-libxcursor  # [linux]
     - xorg-libxext  # [linux]
+    - xorg-libxfixes  # [linux]
     - xorg-libxft  # [linux]
     - xorg-libxpm  # [linux]
     - xrootd
     - xz
-    - zlib
+    # FIXME: The generated allDict.cxx.pch is dependent on versin of the C++ headers used
+    # As it is shipped in the macOS binaries we have to use the same one as in the compilers package
+    - libcxx =4  # [osx]
   run:
     - compilers
     - {{ pin_compatible('numpy') }}
@@ -103,28 +111,21 @@ requirements:
     # - clang_variant * cling_{{ version }}
     - davix
     - fftw
-    - freetype
-    - giflib
-    - gsl
     - gdk-pixbuf
-    - krb5  # [osx]
+    - giflib
+    - glew
+    - graphviz
     - libglu  # [linux]
-    - libpng
     - librsvg
-    - libtiff
-    - libxml2
     - lz4
-    - lz4-c
     # - mysql
     - metakernel
     - notebook
-    - openssl
     - pcre
     # - postgresql
     - pythia8
     - python
     - qt
-    - sqlite
     - tbb
     - tbb-devel
     - vdt
@@ -135,8 +136,8 @@ requirements:
     - xorg-libxft  # [linux]
     - xorg-libxpm  # [linux]
     - xrootd
-    - xz
-    - zlib
+    # FIXME: See comment at end of host requirements
+    - libcxx =4  # [osx]
   run_constrained:
     # Items listed here conflict with ROOT
     # FIXME Add support in ROOT for building with an external cling
@@ -164,6 +165,13 @@ test:
     - thisroot.sh
     - thisroot.csh
     - thisroot.fish
+    # Test if OpenGL is working
+    - root -b -l -q -x -e 'gStyle->SetCanvasPreferGL(kTRUE); c = new TCanvas(); if (!c->UseGL()) { throw std::runtime_error("OpenGL does not appear to be working"); }'
+    # This test will fail due to lack of graphics support but try it anyway
+    # It should exit with "TEveException: TEveManager::Create ROOT is running in batch mode."
+    - root -b -l -q -x "${ROOTSYS}/tutorials/eve/geom_lhcb.C" || true
+    # This tutorial uses davix to access a ROOT file over HTTP
+    - root -b -l -q -x "${ROOTSYS}/tutorials/tree/run_h1analysis.C"
 
 about:
   home: https://root.cern/
