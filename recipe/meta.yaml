@@ -109,6 +109,7 @@ requirements:
     - xorg-libxft  # [linux]
     - xorg-libxpm  # [linux]
     - xrootd
+    - xxhash
     - xz
     # FIXME: The generated allDict.cxx.pch is dependent on versin of the C++ headers used
     # As it is shipped in the macOS binaries we have to use the same one as in the compilers package
@@ -118,8 +119,8 @@ requirements:
     - {{ pin_compatible('numpy') }}
     - afterimage
     - cfitsio
-    # - clangdev={{ clang_version }}
-    # - clang_variant * cling_{{ version }}
+    - clangdev={{ clang_version }}
+    - clang_variant * {{ clang_patches_version }}
     - davix
     - fftw
     - gdk-pixbuf

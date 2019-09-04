@@ -83,7 +83,6 @@ cmake -LAH \
     -Dbuiltin_ftgl=ON \
     -Dbuiltin_xrootd=OFF \
     -Dbuiltin_davix=OFF \
-    -Dbuiltin_llvm=OFF \
     -Dbuiltin_afterimage=OFF \
     -Dbuiltin_zlib=ON \
     -Drpath=ON \
