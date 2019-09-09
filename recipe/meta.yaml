@@ -119,8 +119,8 @@ requirements:
     - {{ pin_compatible('numpy') }}
     - afterimage
     - cfitsio
-    - clangdev={{ clang_version }}
-    - clang_variant * {{ clang_patches_version }}
+    #- clangdev={{ clang_version }}
+    #- clang_variant * {{ clang_patches_version }}
     - davix
     - fftw
     - gdk-pixbuf
