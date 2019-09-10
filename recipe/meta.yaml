@@ -3,7 +3,7 @@
 {% set hash = "ee11687172a5d692a082ebfbeea4e0d5fb2f65db88968c0327d10793561c2c1b" %}
 {% set clang_version = "5.0.0" %}
 {%- if "ROOT_JENKINS_GIT_REV" in os.environ %}
-    {% set version = "6.19.00" %} 
+    {% set version = "6.19.00" %}
     {% set clang_patches_version = "master" %}
 {%- else %}
     {% set clang_patches_version = "6.16.00" %}
@@ -22,8 +22,8 @@ source:
   sha256: {{ hash }}
 {%- endif %}
   folder: root-source
-{%- if os.environ.get("ROOT_JENKINS_GIT_REV", "") != 'master' %}
   patches:
+{%- if os.environ.get("ROOT_JENKINS_GIT_REV", "") != 'master' %}
     - patches/root-6.18.02-dont-use-cmake-cxx-standard.patch
     - patches/root-6.18.02-force-search-of-build-related-files.patch
 {%- endif %}
@@ -34,7 +34,7 @@ source:
     - patches/root-x.xx.xx_clingtest-missing-symbols-and-libraries.patch
 
 build:
-  number: 18
+  number: 17
   skip: True  # [win]
   run_exports:
     # https://abi-laboratory.pro/?view=timeline&l=root

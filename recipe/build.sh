@@ -8,6 +8,8 @@ sed -i -e 's@SetLibraryPath();@@g' \
 # Manually set the deployment_target
 # May not be very important but nice to do
 OLDVERSIONMACOS='${MACOSX_VERSION}'
+sed -i -e "s@${OLDVERSIONMACOS}@${MACOSX_DEPLOYMENT_TARGET}@g" \
+    root-source/cmake/modules/SetUpMacOS.cmake
 
 declare -a CMAKE_PLATFORM_FLAGS
 if [ "$(uname)" == "Linux" ]; then
@@ -78,6 +80,7 @@ cmake -LAH \
     -Dsoversion=ON \
     -Dbuiltin_clang=OFF \
     -Dbuiltin_cling=OFF \
+    -Dbuiltin_llvm=OFF \
     -Dbuiltin_glew=OFF \
     -Dbuiltin_gl2ps=ON \
     -Dbuiltin_ftgl=ON \
